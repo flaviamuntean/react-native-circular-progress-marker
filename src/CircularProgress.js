@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Animated, View } from 'react-native';
-import { Svg, Path, G } from 'react-native-svg';
+import { Svg, Path, G, Circle } from 'react-native-svg';
 
 export default class CircularProgress extends React.PureComponent {
   polarToCartesian(centerX, centerY, radius, angleInDegrees) {
@@ -41,7 +41,8 @@ export default class CircularProgress extends React.PureComponent {
       padding,
       renderCap,
       dashedBackground,
-      dashedTint
+      dashedTint,
+      marker
     } = this.props;
 
     const maxWidthCircle = backgroundWidth ? Math.max(width, backgroundWidth) : width;
@@ -69,6 +70,12 @@ export default class CircularProgress extends React.PureComponent {
       radius,
       currentFillAngle
     );
+    const markerCoordinate = this.polarToCartesian(
+      sizeWithPadding,
+      sizeWithPadding,
+      radius,
+      (arcSweepAngle * this.clampFill(marker)) / 100
+    )
     const cap = this.props.renderCap ? this.props.renderCap({ center: coordinate }) : null;
 
     const offset = size - maxWidthCircle * 2;
@@ -112,6 +119,7 @@ export default class CircularProgress extends React.PureComponent {
                 fill="transparent"
               />
             )}
+            {marker && <Circle cx={markerCoordinate.x} cy={markerCoordinate.y} r={(backgroundWidth || width) / 2} fill={tintColor} />}
             {fill > 0 && (
               <Path
                 d={circlePath}
@@ -151,7 +159,8 @@ CircularProgress.propTypes = {
   padding: PropTypes.number,
   renderCap: PropTypes.func,
   dashedBackground: PropTypes.object,
-  dashedTint: PropTypes.object
+  dashedTint: PropTypes.object,
+  marker: PropTypes.number,
 };
 
 CircularProgress.defaultProps = {
